@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<psalm
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    errorLevel="1"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="true"
+    findUnusedVariablesAndParams="true"
+    memoizeMethodCallResults="true"
+    resolveFromConfigFile="true"
+    reportMixedIssues="false"
+    sealAllMethods="false"
+>
+    <issueHandlers>
+        <!--
+            Entity classes must not be final in order for Doctrine DBAL to work.
+        -->
+        <ClassMustBeFinal>
+            <errorLevel type="suppress">
+                <file name="src/Entity/Format.php"/>
+                <file name="src/Entity/Record.php"/>
+                <file name="src/Entity/Set.php"/>
+                <file name="src/Entity/Token.php"/>
+            </errorLevel>
+        </ClassMustBeFinal>
+        <!--
+            This is a false-positive caused by Doctrine's ArrayCollection.
+        -->
+        <PossiblyNullReference>
+            <errorLevel type="suppress">
+                <file name="src/Console/UpdateFormatsCommand.php"/>
+            </errorLevel>
+        </PossiblyNullReference>
+        <!--
+            DBAL entities require getter/setter methods even if they are never called directly.
+        -->
+        <PossiblyUnusedMethod errorLevel="suppress"/>
+        <PossiblyUnusedReturnValue errorLevel="suppress"/>
+        <!--
+            Some properties are not set in the constructor and hence checked for initialization.
+        -->
+        <PropertyNotSetInConstructor errorLevel="suppress"/>
+        <RedundantPropertyInitializationCheck errorLevel="suppress"/>
+    </issueHandlers>
+    <projectFiles>
+        <file name="bin/cli"/>
+        <directory name="public"/>
+        <directory name="src"/>
+        <ignoreFiles>
+            <directory name="vendor"/>
+        </ignoreFiles>
+    </projectFiles>
+</psalm>

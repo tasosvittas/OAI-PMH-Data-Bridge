@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAI-PMH Data Bridge</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>OAI-PMH Data Bridge</h1>
+            <p>Collect and synchronize data from external sources</p>
+        </header>
+        
+        <div class="content">
+            <!-- Mode Selector -->
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="switchMode('search')">
+                    Search Mode
+                </button>
+                <button class="mode-btn" onclick="switchMode('specific')">
+                    Specific Record
+                </button>
+            </div>
+            
+            <!-- Search Mode -->
+            <div id="mode-search" class="mode-content active">
+                <form id="searchForm">
+                    <div class="form-group">
+                        <label for="source">Data Source:</label>
+                        <select id="source" name="source" required>
+                            <option value="">Select source...</option>
+                            <option value="zenodo">Zenodo</option>
+                            <option value="github">GitHub</option>
+                            <option value="arxiv">arXiv</option>
+                            <option value="jsonplaceholder">Demo (JSONPlaceholder)</option>
+                        </select>
+                        
+                        <div id="info-zenodo" class="source-info">
+                            Research data repository. Example: "covid", "machine learning"
+                        </div>
+                        <div id="info-github" class="source-info">
+                            Code repositories. Example: "python", "react"
+                        </div>
+                        <div id="info-arxiv" class="source-info">
+                            Scientific papers. Example: "neural networks", "quantum computing"
+                        </div>
+                        <div id="info-jsonplaceholder" class="source-info">
+                            Demo data for testing purposes
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="query">Search Query:</label>
+                        <input type="text" id="query" name="query" 
+                               placeholder="e.g., machine learning" 
+                               value="machine learning">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="limit">Number of Results:</label>
+                        <input type="number" id="limit" name="limit" 
+                               min="1" max="50" value="5">
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Collect Data</button>
+                </form>
+            </div>
+            
+            <!-- Specific Record Mode -->
+            <div id="mode-specific" class="mode-content">
+                <form id="specificForm">
+                    <div class="form-group">
+                        <label for="specific-source">Data Source:</label>
+                        <select id="specific-source" required>
+                            <option value="">Select source...</option>
+                            <option value="zenodo">Zenodo</option>
+                            <option value="github">GitHub</option>
+                            <option value="arxiv">arXiv</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="specific-id">Record ID / DOI / URL:</label>
+                        <textarea id="specific-id" required 
+                                  placeholder="Enter ID, DOI, or URL..."></textarea>
+                        
+                        <div class="example-box">
+                            <strong>Examples:</strong><br>
+                            Zenodo: 8186638 or 10.5281/zenodo.8186638<br>
+                            GitHub: torvalds/linux<br>
+                            arXiv: 2301.07041
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Fetch Record</button>
+                </form>
+            </div>
+            
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing request...</p>
+            </div>
+            
+            <!-- Results -->
+            <div class="results" id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const searchForm = document.getElementById('searchForm');
+        const specificForm = document.getElementById('specificForm');
+        const sourceSelect = document.getElementById('source');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        
+        function switchMode(mode) {
+            document.querySelectorAll('.mode-btn').forEach(btn => 
+                btn.classList.remove('active')
+            );
+            document.querySelectorAll('.mode-content').forEach(content => 
+                content.classList.remove('active')
+            );
+            
+            event.target.classList.add('active');
+            document.getElementById('mode-' + mode).classList.add('active');
+            results.classList.remove('active');
+        }
+        
+        sourceSelect.addEventListener('change', function() {
+            document.querySelectorAll('.source-info').forEach(el => 
+                el.classList.remove('active')
+            );
+            if (this.value) {
+                document.getElementById('info-' + this.value).classList.add('active');
+            }
+        });
+        
+        searchForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const source = document.getElementById('source').value;
+            const query = document.getElementById('query').value;
+            const limit = document.getElementById('limit').value;
+            
+            const url = `/sync/${source}?q=${encodeURIComponent(query)}&limit=${limit}`;
+            await fetchData(url);
+        });
+        
+        specificForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const source = document.getElementById('specific-source').value;
+            const id = document.getElementById('specific-id').value.trim();
+            
+            const url = `/sync/specific/${source}?id=${encodeURIComponent(id)}`;
+            await fetchData(url);
+        });
+        
+        async function fetchData(url) {
+            loading.classList.add('active');
+            results.classList.remove('active');
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                loading.classList.remove('active');
+                displayResults(data);
+            } catch (error) {
+                loading.classList.remove('active');
+                results.innerHTML = `
+                    <div class="error">
+                        Error: ${error.message}
+                    </div>
+                `;
+                results.classList.add('active');
+            }
+        }
+        
+        function displayResults(data) {
+            let html = '';
+            
+            if (data.status === 'success') {
+                html = `
+                    <div class="success">
+                        Success! Data collected successfully.
+                    </div>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total:</span>
+                            <span class="stat-value">${data.total_records}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Successful:</span>
+                            <span class="stat-value">${data.successful}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Failed:</span>
+                            <span class="stat-value">${data.failed}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="oai-link">
+                        <strong>View in OAI-PMH:</strong><br>
+                        <a href="http://localhost/?verb=ListRecords&metadataPrefix=oai_dc" target="_blank">Open OAI-PMH Repository</a>
+                    </div>
+                    
+                    <h3>Records:</h3>
+                    <div class="record-list">
+                `;
+                
+                data.details.forEach(record => {
+                    const statusClass = record.status === 'success' ? 'success' : 'error';
+                    const statusText = record.status === 'success' ? 'Success' : 'Failed';
+                    
+                    html += `
+                        <div class="record-item ${statusClass}">
+                            <div class="record-status">${statusText}</div>
+                            <div class="record-title">${record.title}</div>
+                            <div class="record-id">ID: ${record.identifier}</div>
+                            ${record.error ? `<div class="record-error">${record.error}</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            } else {
+                html = `
+                    <div class="error">
+                        Error: ${data.message}
+                    </div>
+                `;
+            }
+            
+            results.innerHTML = html;
+            results.classList.add('active');
+        }
+    </script>
+</body>
+</html>

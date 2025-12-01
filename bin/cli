@@ -1,0 +1,97 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * OAI-PMH 2.0 Data Provider
+ * Copyright (C) 2024 Sebastian Meyer <sebastian.meyer@opencultureconsulting.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+declare(strict_types=1);
+
+namespace OCC\OaiPmh2;
+
+use Composer\InstalledVersions;
+use Doctrine\ORM\Tools\Console\Command as DoctrineORMCommand;
+use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
+use OCC\OaiPmh2\Configuration;
+use OCC\OaiPmh2\Console as Command;
+use Symfony\Component\Console\Application;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+/**
+ * Provides the Command Line Interface.
+ *
+ * @author Sebastian Meyer <sebastian.meyer@opencultureconsulting.com>
+ * @package OAIPMH2
+ */
+final class Cli extends Application
+{
+    /**
+     * Register commands for Doctrine DBAL.
+     *
+     * @return void
+     */
+    protected function addDoctrineCommands(): void
+    {
+        $entityManagerProvider = new SingleManagerProvider(EntityManager::getInstance());
+        $this->addCommands([
+            // Doctrine ORM commands
+            (new DoctrineORMCommand\ClearCache\MetadataCommand($entityManagerProvider))->setHidden(),
+            (new DoctrineORMCommand\ClearCache\QueryCommand($entityManagerProvider))->setHidden(),
+            (new DoctrineORMCommand\ClearCache\ResultCommand($entityManagerProvider))->setHidden()
+        ]);
+    }
+
+    /**
+     * Register commands for OAI-PMH2 tasks.
+     *
+     * @return void
+     */
+    protected function addOaiCommands(): void
+    {
+        $this->addCommands([
+            new Command\AddRecordCommand(),
+            new Command\AddSetCommand(),
+            new Command\CsvImportCommand(),
+            new Command\DeleteRecordCommand(),
+            new Command\DeleteSetCommand(),
+            new Command\PruneDeletedRecordsCommand(),
+            new Command\PruneOrphanedSetsCommand(),
+            new Command\PruneResumptionTokensCommand(),
+            new Command\UpdateFormatsCommand(),
+            new Command\UpgradeAppCommand(),
+            new Command\UpgradeDatabaseCommand()
+        ]);
+    }
+
+    /**
+     * Create new Command Line Interface instance.
+     */
+    public function __construct()
+    {
+        parent::__construct(
+            Configuration::getInstance()->repositoryName,
+            InstalledVersions::getVersion('opencultureconsulting/oai-pmh2') ?? 'unknown'
+        );
+        $this->setCatchExceptions(true);
+        $this->addDoctrineCommands();
+        $this->addOaiCommands();
+    }
+}
+
+$cli = new Cli();
+$cli->run();

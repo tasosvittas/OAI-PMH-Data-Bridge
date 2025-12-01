@@ -1,0 +1,130 @@
+{
+    "name": "opencultureconsulting/oai-pmh2",
+    "description": "This is a stand-alone OAI-PMH 2.0 data provider. It serves records in any XML metadata format from a database, supports deleted records, resumption tokens and sets.",
+    "type": "project",
+    "keywords": [
+        "oai",
+        "oaipmh",
+        "oaipmh2",
+        "oai-pmh",
+        "oai-pmh2",
+        "code4lib"
+    ],
+    "homepage": "https://code.opencultureconsulting.com/oai-pmh2/",
+    "readme": "README.md",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Open Culture Consulting",
+            "email": "office@opencultureconsulting.com",
+            "homepage": "https://www.opencultureconsulting.com",
+            "role": "maintainer"
+        },
+        {
+            "name": "Sebastian Meyer",
+            "email": "sebastian.meyer@opencultureconsulting.com",
+            "homepage": "https://www.informathekar.de",
+            "role": "developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/opencultureconsulting/oai-pmh2/issues",
+        "source": "https://github.com/opencultureconsulting/oai-pmh2",
+        "docs": "https://code.opencultureconsulting.com/oai-pmh2/"
+    },
+    "require": {
+        "php": "^8.1",
+        "ext-dom": "*",
+        "ext-simplexml": "*",
+        "ext-sqlite3": "*",
+        "ext-zip": "*",
+        "composer-runtime-api": "^2.1",
+        "composer/composer": "^2.9",
+        "doctrine/dbal": "^4.2",
+        "doctrine/orm": "^3.5",
+        "opencultureconsulting/basics": "^2.1",
+        "opencultureconsulting/psr15": "^1.3",
+        "symfony/cache": "^6.4",
+        "symfony/console": "^6.4",
+        "symfony/filesystem": "^6.4",
+        "symfony/http-client": "^6.4",
+        "symfony/validator": "^6.4",
+        "symfony/yaml": "^6.4"
+    },
+    "require-dev": {
+        "phpdocumentor/shim": "^3.9",
+        "phpmd/phpmd": "^2.15",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "friendsofphp/php-cs-fixer": "^3.90",
+        "squizlabs/php_codesniffer": "^3.13",
+        "vimeo/psalm": "^6.13"
+    },
+    "autoload": {
+        "psr-4": {
+            "OCC\\OaiPmh2\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "phpdocumentor/shim": true
+        },
+        "apcu-autoloader": true,
+        "optimize-autoloader": true
+    },
+    "scripts": {
+        "pre-install-cmd": [
+            "@php -r \"if (!is_dir('./data')) { umask(0); mkdir('./data', 0775); }\"",
+            "@php -r \"if (!file_exists('./config/config.yml')) { copy('./config/config.dist.yml', './config/config.yml'); }\""
+        ],
+        "post-install-cmd": [
+            "@php bin/cli orm:clear-cache:metadata --quiet",
+            "@php bin/cli orm:clear-cache:query --quiet",
+            "@php bin/cli orm:clear-cache:result --quiet"
+        ],
+        "post-create-project-cmd": [
+            "@php bin/cli app:install:db --no-interaction --quiet",
+            "@php bin/cli oai:update:formats --quiet"
+        ],
+        "post-upgrade-cmd": [
+            "@php bin/cli app:upgrade:db --no-interaction --quiet"
+        ],
+        "php-cs-fixer:check": [
+            "@php vendor/bin/php-cs-fixer check"
+        ],
+        "php-cs-fixer:fix": [
+            "@php vendor/bin/php-cs-fixer fix"
+        ],
+        "phpcs:check": [
+            "@php vendor/bin/phpcs"
+        ],
+        "phpdoc:build": [
+            "@php vendor/bin/phpdoc"
+        ],
+        "phpmd:check": [
+            "@php -r \"if (!file_exists('./.phpmd.xml')) { copy('./.phpmd.dist.xml', './.phpmd.xml'); }\"",
+            "@php vendor/bin/phpmd bin/,public/,src/ ansi .phpmd.xml --cache"
+        ],
+        "phpstan:check": [
+            "@php vendor/bin/phpstan"
+        ],
+        "psalm:check": [
+            "@php vendor/bin/psalm"
+        ],
+        "psalm:check-security": [
+            "@php vendor/bin/psalm --taint-analysis"
+        ]
+    },
+    "scripts-descriptions": {
+        "post-upgrade-cmd": "Runs database migrations and other maintenance tasks required after an upgrade. This is triggered by 'bin/cli app:upgrade' and should not be run by itself.",
+        "php-cs-fixer:check": "Runs a code check with PHP Coding Standards Fixer and reports problems. If a custom configuration file '.php-cs-fixer.php' exists, it will be used instead of the default settings in '.php-cs-fixer.dist.php'.",
+        "php-cs-fixer:fix": "Runs a code check with PHP Coding Standards Fixer and tries to fix all issues. If a custom configuration file '.php-cs-fixer.php' exists, it will be used instead of the default settings in '.php-cs-fixer.dist.php'.",
+        "phpcs:check": "Runs a code check with PHP_CodeSniffer and reports problems. If a custom configuration file '.phpcs.xml' exists, it will be used instead of the default settings in '.phpcs.xml.dist'.",
+        "phpdoc:build": "Builds the documentation from template files in .phpdoc/. If a custom configuration file 'phpdoc.xml' exists, it will be used instead of the default settings in 'phpdoc.dist.xml'.",
+        "phpmd:check": "Runs a code check with PHP Mess Detector static code analyzer and reports problems. If a custom configuration file '.phpmd.xml' exists, it will be used instead of the default settings in '.phpmd.dist.xml'.",
+        "phpstan:check": "Runs a code check with PHPStan static code analyzer and reports problems. If a custom configuration file 'phpstan.neon' exists, it will be used instead of the default settings in 'phpstan.dist.neon'.",
+        "psalm:check": "Runs a code check with Psalm static code analyzer and reports problems. If a custom configuration file 'psalm.xml' exists, it will be used instead of the default settings in 'psalm.xml.dist'.",
+        "psalm:check-security": "Runs a code check with Psalm static code analyzer and reports security issues. If a custom configuration file 'psalm.xml' exists, it will be used instead of the default settings in 'psalm.xml.dist'."
+    }
+}

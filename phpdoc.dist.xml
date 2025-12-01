@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor
+    configVersion="3"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://www.phpdoc.org"
+    xsi:schemaLocation="https://www.phpdoc.org https://raw.githubusercontent.com/phpDocumentor/phpDocumentor/master/data/xsd/phpdoc.xsd">
+    <title>OAI-PMH2 Data Provider</title>
+    <paths>
+        <output>doc</output>
+        <cache>.phpdoc/cache</cache>
+    </paths>
+    <version number="latest">
+        <api format="php">
+            <source dsn=".">
+                <!-- Disable API documentation. -->
+                <path>/non-existent</path>
+            </source>
+        </api>
+        <guide format="rst">
+            <source dsn=".">
+                <path>/.phpdoc/guide</path>
+            </source>
+            <output>guides</output>
+        </guide>
+    </version>
+    <setting name="graphs.enabled" value="false"/>
+    <setting name="guides.enabled" value="true"/>
+    <setting name="template.color" value="orange"/>
+</phpdocumentor>

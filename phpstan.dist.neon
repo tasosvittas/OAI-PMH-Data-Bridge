@@ -1,0 +1,19 @@
+#
+# Configuration for PHPStan.
+# @see https://phpstan.org/config-reference
+#
+
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+
+parameters:
+    level: 10
+    phpVersion: 80100 # PHP 8.1
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        - identifier: ternary.shortNotAllowed
+    paths:
+        - bin
+        - public
+        - src
