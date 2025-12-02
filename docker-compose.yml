@@ -28,7 +28,7 @@ services:
       - ./:/oai-pmh2:ro
     environment:
       - OAI_PMH_CLI_PATH=/oai-pmh2/bin/cli
-      - OAI_PMH_BASE_URL=http://localhost:80/
+      - OAI_PMH_BASE_URL=http://oai-pmh/
       - FLASK_HOST=0.0.0.0
       - FLASK_PORT=5000
     networks:
