@@ -9,8 +9,9 @@ automated dataset ingestion.
 ## Features
 
 -   Sync datasets from:
-    -   GitHub repositories\
+    -   GitHub repositories
     -   Zenodo records
+    -   arxiv records
 -   Full **OAI-PMH 2.0** data provider
 -   Web UI for dataset management
 -   Dockerized architecture (PHP/Apache, Flask, Nginx)
