@@ -20,23 +20,11 @@ automated dataset ingestion.
 
 ## Architecture Overview
 
-The system consists of three main services:
+The project consists of three main services:
 
-### 1. OAI-PMH Provider (PHP/Apache)
-
--   Doctrine ORM\
--   Symfony Console\
--   Exposes repository metadata and records using OAI-PMH verbs
-
-### 2. Bridge Application (Python/Flask)
-
--   Handles synchronization and dataset ingestion\
--   Web interface + REST endpoints
-
-### 3. Nginx Reverse Proxy
-
--   Routes traffic between services\
--   Provides a single access point
+- **OAI-PMH Provider** (PHP/Apache) - OAI-PMH 2.0 compliant repository
+- **Bridge Application** (Python/Flask) - Data synchronization interface
+- **Nginx** - Reverse proxy and load balancer
 
 ## Prerequisites
 
@@ -176,4 +164,24 @@ docker-compose down
 
 ``` bash
 docker-compose up -d
+```
+
+## Troubleshooting
+
+### Containers won't start
+``` bash
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+### Permission errors
+``` bash
+docker-compose exec oai-pmh bash -c "chmod -R 777 var temp data"
+docker-compose restart oai-pmh
+```
+
+### Clear cache
+``` bash
+docker-compose exec oai-pmh php bin/cli oai:clear-cache
 ```
