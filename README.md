@@ -84,11 +84,10 @@ docker-compose ps
 
 ## Bridge Interface Features
 
--   GitHub repository search\
--   Zenodo dataset search\
--   Dataset import\
--   Record browsing\
--   Health status at `/health`
+1. **Search GitHub**: Find and import GitHub repositories
+2. **Search Zenodo**: Find and import Zenodo datasets
+3. **View Records**: Browse imported records
+4. **Health Check**: Monitor system status at `/health`
 
 ## Supported OAI-PMH 2.0 Endpoints
 
