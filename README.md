@@ -1,134 +1,179 @@
 # OAI-PMH Data Bridge
 
-A Docker-based bridge application that synchronizes research datasets from external repositories (GitHub, Zenodo) to a local OAI-PMH 2.0 repository.
+A Docker-based bridge application that synchronizes research datasets
+from external sources (GitHub, Zenodo) into a fully compliant **OAI-PMH
+2.0 repository**.\
+Designed for reproducible research, metadata interoperability, and
+automated dataset ingestion.
 
 ## Features
 
-- Sync datasets from GitHub repositories and Zenodo
-- OAI-PMH compliant data provider
-- Fully containerized with Docker
-- Web interface for easy data management
-- Support for Dublin Core metadata format (oai_dc)
-- Search and filter capabilities
+-   Sync datasets from:
+    -   GitHub repositories\
+    -   Zenodo records
+-   Full **OAI-PMH 2.0** data provider
+-   Web UI for dataset management
+-   Dockerized architecture (PHP/Apache, Flask, Nginx)
+-   Dublin Core (oai_dc) metadata support
+-   Search and filtering tools
+-   Lightweight SQLite backend
 
-## Architecture
+## Architecture Overview
 
-The project consists of three main services:
+The system consists of three main services:
 
-- **OAI-PMH Provider** (PHP/Apache) - OAI-PMH 2.0 compliant repository
-- **Bridge Application** (Python/Flask) - Data synchronization interface
-- **Nginx** - Reverse proxy and load balancer
+### 1. OAI-PMH Provider (PHP/Apache)
+
+-   Doctrine ORM\
+-   Symfony Console\
+-   Exposes repository metadata and records using OAI-PMH verbs
+
+### 2. Bridge Application (Python/Flask)
+
+-   Handles synchronization and dataset ingestion\
+-   Web interface + REST endpoints
+
+### 3. Nginx Reverse Proxy
+
+-   Routes traffic between services\
+-   Provides a single access point
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+Install before starting:
 
-- **Docker Desktop** - [Download here](https://www.docker.com/products/docker-desktop/)
-- **Git** - For cloning the repository
+-   **Docker Desktop**\
+    https://www.docker.com/products/docker-desktop/
+-   **Git**
 
 ## Quick Start
 
-### Installation
-1. Clone the repository
+### 1. Clone the repository
+
+``` bash
 git clone https://github.com/YOUR_USERNAME/OAI-PMH-Data-Bridge.git
-
-2. Navigate to project directory
 cd OAI-PMH-Data-Bridge
+```
 
-3. Copy configuration template
-copy config\config.dist.yml config\config.yml
 
-4. Build and start containers
+### 2. Build and start the containers
+
+``` bash
 docker-compose up -d --build
+```
 
-5. Wait for services to initialize (60 seconds)
+### 3. Wait \~60 seconds for initialization
 
-6. Configure Doctrine proxies
+### 4. Configure Doctrine proxy directory
+
+``` bash
 docker-compose exec oai-pmh bash -c "mkdir -p var/generated && chmod -R 777 var"
+```
 
-8. Restart PHP container
+### 5. Restart the OAI-PMH container
+
+``` bash
 docker-compose restart oai-pmh
+```
 
+## Verification
 
-### Verification
+Check running containers:
 
-Check that all services are running:
+``` bash
 docker-compose ps
-
+```
 
 ## Usage
 
 ### Access Points
 
-- **Bridge Web Interface**: http://localhost:5000/
-- **OAI-PMH Repository**: http://localhost/
-- **List Records**: http://localhost/?verb=ListRecords&metadataPrefix=oai_dc
+  ------------------------------------------------------------------------------------------------------
+  Service                                     URL
+  ------------------------------------------- ----------------------------------------------------------
+  Bridge Web Interface                        http://localhost:5000/
 
-### Bridge Interface Features
+  OAI-PMH Repository                          http://localhost/
 
-1. **Search GitHub**: Find and import GitHub repositories
-2. **Search Zenodo**: Find and import Zenodo datasets
-3. **View Records**: Browse imported records
-4. **Health Check**: Monitor system status at `/health`
+  ListRecords (oai_dc)                        http://localhost/?verb=ListRecords&metadataPrefix=oai_dc
+  ------------------------------------------------------------------------------------------------------
 
-### OAI-PMH Endpoints
+## Bridge Interface Features
 
-Standard OAI-PMH 2.0 verbs are supported:
+-   GitHub repository search\
+-   Zenodo dataset search\
+-   Dataset import\
+-   Record browsing\
+-   Health status at `/health`
 
-- `?verb=Identify` - Repository information
-- `?verb=ListMetadataFormats` - Available metadata formats
-- `?verb=ListRecords&metadataPrefix=oai_dc` - List all records
-- `?verb=GetRecord&identifier=ID&metadataPrefix=oai_dc` - Get single record
-- `?verb=ListSets` - List available sets
+## Supported OAI-PMH 2.0 Endpoints
+
+-   `?verb=Identify`
+-   `?verb=ListMetadataFormats`
+-   `?verb=ListRecords&metadataPrefix=oai_dc`
+-   `?verb=GetRecord&identifier={ID}&metadataPrefix=oai_dc`
+-   `?verb=ListSets`
+
+Example:
+
+``` bash
+http://localhost/?verb=ListRecords&metadataPrefix=oai_dc
+```
 
 ## Project Structure
-OAI-PMH-Data-Bridge/
-├── bin/ # CLI tools
-├── bridge/ # Python Flask bridge application
-├── config/ # Configuration files
-├── data/ # SQLite database
-├── docker/ # Docker configuration
-├── public/ # PHP public directory
-├── src/ # OAI-PMH PHP source code
-├── var/ # Cache and generated files
-├── docker-compose.yml # Docker Compose configuration
-├── Dockerfile.php # PHP container image
-└── README.md # This file
 
+    OAI-PMH-Data-Bridge/
+    ├── bin/                 # CLI tools
+    ├── bridge/              # Python Flask bridge application
+    ├── config/              # YAML configuration files
+    ├── data/                # SQLite database
+    ├── docker/              # Docker-level configuration
+    ├── public/              # OAI-PMH public directory (PHP)
+    ├── src/                 # PHP OAI-PMH source code
+    ├── var/                 # Cache and generated proxies
+    ├── Dockerfile.php       # PHP/Apache build image
+    ├── docker-compose.yml   # Multi-service environment
+    └── README.md
 
 ## Technology Stack
 
 ### Backend
-- PHP 8.1 with Apache
-- Doctrine ORM
-- Symfony Console
-- Python 3.11
-- Flask
+
+-   PHP 8.1 (Apache)
+-   Doctrine ORM
+-   Symfony Console
+-   Python 3.11 (Flask)
 
 ### Database
-- SQLite 3
+
+-   SQLite 3
 
 ### Infrastructure
-- Docker & Docker Compose
-- Nginx
+
+-   Docker & Docker Compose
+-   Nginx Reverse Proxy
 
 ## Configuration
 
 Edit `config/config.yml` to customize:
 
-- Repository name and admin email
-- Database connection (default: SQLite)
-- Metadata formats
-- Deleted records policy
-- Maximum records per request
-- Resumption token validity
+-   Repository name and admin e-mail\
+-   Database connection settings\
+-   Metadata formats\
+-   Deleted record policies\
+-   Max records per request\
+-   Resumption token validity
 
-## Stopping the Application
+## Managing the Application
 
+### Stop all services
+
+``` bash
 docker-compose down
+```
 
+### Restart after initial setup
 
-## Restarting (After Initial Setup)
-
-cd OAI-PMH-Data-Bridge
+``` bash
 docker-compose up -d
+```
