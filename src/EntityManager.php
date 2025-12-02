@@ -415,7 +415,8 @@ final class EntityManager extends EntityManagerDecorator
     {
         $config = new DoctrineConfiguration();
         if (PHP_VERSION_ID < 80400) {
-            $config->setAutoGenerateProxyClasses(ProxyFactory::AUTOGENERATE_NEVER);
+            // $config->setAutoGenerateProxyClasses(ProxyFactory::AUTOGENERATE_NEVER);
+            $config->setAutoGenerateProxyClasses(ProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS); 
             $config->setProxyDir(__DIR__ . '/../var/generated');
             $config->setProxyNamespace('OCC\OaiPmh2\Entity\Proxy');
         } else {

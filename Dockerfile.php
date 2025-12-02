@@ -48,14 +48,17 @@ COPY . /var/www/html/
 # Run post-install scripts (now bin/cli exists)
 RUN composer run-script post-install-cmd || true
 
-# Generate Doctrine proxies at build time
+# Create var/generated with proper permissions BEFORE generating proxies
 RUN mkdir -p var/generated \
-    && php bin/cli orm:generate-proxies || true
+    && chmod -R 777 var/generated
+
+# Generate Doctrine proxies (with verbose output to see if it works)
+RUN php bin/cli orm:generate-proxies --verbose || echo "Proxy generation warning (will auto-generate on first use)"
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
-    && chmod -R 777 var temp data
+    && chmod -R 777 var temp data var/generated
 
 # Apache configuration
 RUN echo '<VirtualHost *:80>\n\
