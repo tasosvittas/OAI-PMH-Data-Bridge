@@ -112,8 +112,6 @@ def _transform_zenodo_record(hit):
     
     creators = metadata.get('creators', [])
     creator_names = [c.get('name', 'Unknown') for c in creators]
-    
-    # ✅ FIXED: Clean HTML from description
     description = clean_text(metadata.get('description', 'No description'))
     if len(description) > 500:
         description = description[:500] + '...'
@@ -188,7 +186,6 @@ def fetch_github_by_id(repo_path):
 
 def _transform_github_record(repo):
     """Transform GitHub record to standard format"""
-    # ✅ FIXED: Clean HTML from description
     description = clean_text(repo.get('description', '') or 'No description')
     
     return {
@@ -273,7 +270,6 @@ def _transform_arxiv_record(entry, ns):
     id_text = arxiv_id.text if arxiv_id is not None else ''
     arxiv_num = id_text.split('/abs/')[-1] if '/abs/' in id_text else ''
     
-    # ✅ FIXED: Clean and truncate description
     summary_text = summary.text.strip() if summary is not None else ''
     description = clean_text(summary_text)
     if len(description) > 500:
@@ -302,7 +298,6 @@ def fetch_jsonplaceholder(limit, query=''):
         
         records = []
         for post in posts[:limit]:
-            # ✅ FIXED: Clean description
             records.append({
                 'identifier': f'jsonplaceholder:post:{post["id"]}',
                 'datestamp': datetime.now().strftime('%Y-%m-%d'),

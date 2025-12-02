@@ -5,10 +5,9 @@ services:
       dockerfile: Dockerfile.php
     container_name: oai-pmh2-php
     volumes:
-      - ./config:/var/www/html/config    # Only mount config
-      - ./data:/var/www/html/data        # Only mount data
-      - ./var:/var/www/html/var          # Only mount var
-      # DON'T mount vendor!
+      - ./config:/var/www/html/config   
+      - ./data:/var/www/html/data        
+      - ./var:/var/www/html/var          
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html/public
     networks:

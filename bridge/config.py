@@ -1,24 +1,3 @@
-# """Configuration settings"""
-# import os
-
-# # Config
-# OAI_PMH_CLI = 'C:/xampp82/htdocs/oai-pmh2/bin/cli'
-# OAI_PMH_BASE_URL = 'http://localhost/oai-pmh2/public/'
-# TEMP_DIR = 'C:/xampp82/htdocs/oai-pmh2/temp'
-
-# # API Tokens (optional)
-# ZENODO_TOKEN = os.getenv('ZENODO_TOKEN', '')
-# GITHUB_TOKEN = os.getenv('GITHUB_TOKEN', '')
-
-# # Flask
-# FLASK_HOST = '0.0.0.0'
-# FLASK_PORT = 5000
-# FLASK_DEBUG = True
-
-# # Ensure temp directory exists
-# os.makedirs(TEMP_DIR, exist_ok=True)
-
-
 """Configuration settings - Docker compatible"""
 import os
 from pathlib import Path
