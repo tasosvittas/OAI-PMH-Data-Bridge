@@ -1,29 +1,62 @@
-# OAI-PMH2 Data Provider
+# OAI-PMH Data Bridge
 
-***A stand-alone, easy to maintain application for providing a data service following the [Open Archives Initiative Protocol for Metadata Harvesting 2.0 (OAI-PMH2)](https://openarchives.org/OAI/openarchivesprotocol.html).***
+A Docker-based bridge application that synchronizes research datasets from external repositories (GitHub, Zenodo) to a local OAI-PMH 2.0 repository.
 
-The OAI-PMH2 Data Provider serves records in multiple XML formats from any SQL database. It supports persistent deletion policies by transparently keeping track of deleted records, can manage hierarchical sets with descriptions and uses resumption tokens for flow control.
+## Features
 
-This application follows the highest coding standards of [PHPStan](https://phpstan.org/), [Psalm](https://psalm.dev/), [PHP Mess Detector](https://phpmd.org/), [PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer/), and complies to [PSR-12](https://www.php-fig.org/psr/psr-12/) code style guidelines to make sure it is reliable, maintainable and easily reusable.
+- Sync datasets from GitHub repositories and Zenodo
+- OAI-PMH compliant data provider
+- Fully containerized with Docker
+- Web interface for easy data management
+- Support for Dublin Core metadata format (oai_dc)
+- Search and filter capabilities
+
+## Architecture
+
+The project consists of three main services:
+
+- **OAI-PMH Provider** (PHP/Apache) - OAI-PMH 2.0 compliant repository
+- **Bridge Application** (Python/Flask) - Data synchronization interface
+- **Nginx** - Reverse proxy and load balancer
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- **Docker Desktop** - [Download here](https://www.docker.com/products/docker-desktop/)
+- **Git** - For cloning the repository
 
 ## Quick Start
 
-The intended and recommended way of installing this application is via [Composer](https://getcomposer.org/). The following command will get you the latest version:
+### Installation
+1. Clone the repository
+git clone https://github.com/YOUR_USERNAME/OAI-PMH-Data-Bridge.git
 
-```shell
-composer create-project opencultureconsulting/oai-pmh2 --ask --no-dev
-```
+2. Navigate to project directory
+cd OAI-PMH-Data-Bridge
 
-All available versions as well as further information about requirements and dependencies can be found on [Packagist](https://packagist.org/packages/opencultureconsulting/oai-pmh2).
+3. Copy configuration template
+copy config\config.dist.yml config\config.yml
 
-## Full Documentation
+4. Build and start containers
+docker-compose up -d --build
 
-The full documentation is available on [GitHub Pages](https://code.opencultureconsulting.com/oai-pmh2/) or alternatively in [doc/](doc/).
+5. Wait for services to initialize (60 seconds)
 
-## Quality Gates
+6. Configure Doctrine proxies
+docker-compose exec oai-pmh bash -c "mkdir -p var/generated && chmod -R 777 var"
 
-[![PHPCS](https://github.com/opencultureconsulting/oai-pmh2/actions/workflows/phpcs.yml/badge.svg)](https://github.com/opencultureconsulting/oai-pmh2/actions/workflows/phpcs.yml)
-[![PHPMD](https://github.com/opencultureconsulting/oai-pmh2/actions/workflows/phpmd.yml/badge.svg)](https://github.com/opencultureconsulting/oai-pmh2/actions/workflows/phpmd.yml)
+8. Restart PHP container
+docker-compose restart oai-pmh
 
-[![PHPStan](https://github.com/opencultureconsulting/oai-pmh2/actions/workflows/phpstan.yml/badge.svg)](https://github.com/opencultureconsulting/oai-pmh2/actions/workflows/phpstan.yml)
-[![Psalm](https://github.com/opencultureconsulting/oai-pmh2/actions/workflows/psalm.yml/badge.svg)](https://github.com/opencultureconsulting/oai-pmh2/actions/workflows/psalm.yml)
+
+### Verification
+
+Check that all services are running:
+docker-compose ps
+
+
+### Test the service:
+http://localhost:5000/
+
+
