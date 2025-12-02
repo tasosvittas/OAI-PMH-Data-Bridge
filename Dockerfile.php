@@ -48,6 +48,10 @@ COPY . /var/www/html/
 # Run post-install scripts (now bin/cli exists)
 RUN composer run-script post-install-cmd || true
 
+# Generate Doctrine proxies at build time
+RUN mkdir -p var/generated \
+    && php bin/cli orm:generate-proxies || true
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
