@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions (SimpleXML is built-in but needs libxml)
+# Install PHP extensions
 RUN docker-php-ext-install \
     pdo_mysql \
     mbstring \
@@ -25,9 +25,6 @@ RUN docker-php-ext-install \
     xml \
     dom
 
-# Verify SimpleXML is available
-RUN php -r "if (!function_exists('simplexml_load_string')) { echo 'ERROR: SimpleXML not available\n'; exit(1); } else { echo 'SimpleXML OK\n'; }"
-
 # Enable Apache modules
 RUN a2enmod rewrite headers
 
@@ -36,20 +33,25 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy application
+# Copy composer files first (better caching)
+COPY composer.json composer.lock ./
+
+# Create directories that composer scripts might need
+RUN mkdir -p bin config data var temp
+
+# Install dependencies FIRST (before copying the rest)
+RUN composer install --no-interaction --no-dev --optimize-autoloader --no-scripts
+
+# NOW copy everything else
 COPY . /var/www/html/
 
-# Install Composer dependencies
-RUN if [ -f composer.json ]; then \
-        composer install --no-interaction --no-dev --optimize-autoloader 2>&1 || \
-        echo "Composer install completed"; \
-    fi
+# Run post-install scripts (now bin/cli exists)
+RUN composer run-script post-install-cmd || true
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
-    && mkdir -p var temp \
-    && chmod -R 777 var temp
+    && chmod -R 777 var temp data
 
 # Apache configuration
 RUN echo '<VirtualHost *:80>\n\

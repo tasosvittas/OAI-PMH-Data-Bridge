@@ -5,7 +5,10 @@ services:
       dockerfile: Dockerfile.php
     container_name: oai-pmh2-php
     volumes:
-      - ./:/var/www/html
+      - ./config:/var/www/html/config    # Only mount config
+      - ./data:/var/www/html/data        # Only mount data
+      - ./var:/var/www/html/var          # Only mount var
+      # DON'T mount vendor!
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html/public
     networks:
@@ -23,11 +26,9 @@ services:
       - ./bridge:/app
       - ./temp:/app/temp
       - ./:/oai-pmh2:ro
-      # Mount Docker socket to allow docker exec
-      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - OAI_PMH_CLI_PATH=/oai-pmh2/bin/cli
-      - OAI_PMH_BASE_URL=http://locahost:80/
+      - OAI_PMH_BASE_URL=http://localhost:80/
       - FLASK_HOST=0.0.0.0
       - FLASK_PORT=5000
     networks:
@@ -53,3 +54,4 @@ services:
 networks:
   oai-network:
     driver: bridge
+
