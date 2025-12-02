@@ -1,8 +1,6 @@
 # OAI-PMH Data Bridge
 
-A Docker-based bridge application that synchronizes research datasets
-from external sources (GitHub, Zenodo) into a fully compliant **OAI-PMH
-2.0 repository**.\
+A Docker-based bridge application that synchronizes research datasets from external repositories (GitHub, Zenodo) to a local OAI-PMH repository.**.\
 Designed for reproducible research, metadata interoperability, and
 automated dataset ingestion.
 
