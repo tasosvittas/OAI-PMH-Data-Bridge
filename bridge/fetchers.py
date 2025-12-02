@@ -1,8 +1,27 @@
 """Data fetching from external sources"""
 import requests
+import re
+from html import unescape
 from datetime import datetime
 from lxml import etree
 from config import ZENODO_TOKEN, GITHUB_TOKEN
+
+
+def clean_text(text):
+    """Remove HTML tags and clean text"""
+    if not text:
+        return ''
+    
+    # Remove HTML tags
+    text = re.sub(r'<[^>]+>', '', text)
+    
+    # Decode HTML entities
+    text = unescape(text)
+    
+    # Remove extra whitespace
+    text = ' '.join(text.split())
+    
+    return text
 
 
 def fetch_from_source(source, limit, query):
@@ -94,7 +113,8 @@ def _transform_zenodo_record(hit):
     creators = metadata.get('creators', [])
     creator_names = [c.get('name', 'Unknown') for c in creators]
     
-    description = metadata.get('description', 'No description')
+    # ✅ FIXED: Clean HTML from description
+    description = clean_text(metadata.get('description', 'No description'))
     if len(description) > 500:
         description = description[:500] + '...'
     
@@ -168,12 +188,15 @@ def fetch_github_by_id(repo_path):
 
 def _transform_github_record(repo):
     """Transform GitHub record to standard format"""
+    # ✅ FIXED: Clean HTML from description
+    description = clean_text(repo.get('description', '') or 'No description')
+    
     return {
         'identifier': f'github:repo:{repo["id"]}',
         'datestamp': repo['created_at'][:10],
         'title': repo['full_name'],
         'creator': repo['owner']['login'],
-        'description': repo['description'] or 'No description',
+        'description': description,
         'url': repo['html_url']
     }
 
@@ -250,12 +273,18 @@ def _transform_arxiv_record(entry, ns):
     id_text = arxiv_id.text if arxiv_id is not None else ''
     arxiv_num = id_text.split('/abs/')[-1] if '/abs/' in id_text else ''
     
+    # ✅ FIXED: Clean and truncate description
+    summary_text = summary.text.strip() if summary is not None else ''
+    description = clean_text(summary_text)
+    if len(description) > 500:
+        description = description[:500] + '...'
+    
     return {
         'identifier': f'arxiv:{arxiv_num}',
         'datestamp': published.text[:10] if published is not None else '',
         'title': title.text.strip() if title is not None else 'Untitled',
         'creator': '; '.join(author_names) if author_names else 'Unknown',
-        'description': summary.text.strip()[:500] if summary is not None else '',
+        'description': description,
         'url': id_text
     }
 
@@ -273,12 +302,13 @@ def fetch_jsonplaceholder(limit, query=''):
         
         records = []
         for post in posts[:limit]:
+            # ✅ FIXED: Clean description
             records.append({
                 'identifier': f'jsonplaceholder:post:{post["id"]}',
                 'datestamp': datetime.now().strftime('%Y-%m-%d'),
                 'title': post['title'],
                 'creator': f'User {post["userId"]}',
-                'description': post['body']
+                'description': clean_text(post['body'])
             })
         
         return records
