@@ -1,20 +1,20 @@
-/.ddev/
-!/.ddev/config.yaml
-/.phpdoc/cache/
-/.vscode/
-/config/config.yml
-/data/
-/var/
-/vendor/
-.php-cs-fixer.cache
-.php-cs-fixer.php
-.phpmd.result-cache.php
-.phpmd.xml
-phpcs.xml
-phpdoc.xml
-phpstan.neon
-psalm.xml
-TODO
+# /.ddev/
+# !/.ddev/confi
+# /.phpdoc/cache/
+# /.vscode/
+# /config/config.yml
+# /data/
+# /var/
+# /vendor/
+# .php-cs-fixer.cache
+# .php-cs-fixer.php
+# .phpmd.result-cache.php
+# .phpmd.xml
+# phpcs.xml
+# phpdoc.xml
+# phpstan.neon
+# psalm.xml
+# TODO
 
 # Vendor
 /vendor/
