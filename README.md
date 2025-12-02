@@ -75,13 +75,17 @@ docker-compose ps
 
 ### Access Points
 
-  ------------------------------------------------------------------------------------------------------
-  Bridge Web Interface                        http://localhost:5000/
+---------------------------------------------------------------  
+**Bridge Web Interface**  
+http://localhost:5000/
 
-  OAI-PMH Repository                          http://localhost/
+**OAI-PMH Repository**  
+http://localhost/
 
-  ListRecords (oai_dc)                        http://localhost/?verb=ListRecords&metadataPrefix=oai_dc
-  ------------------------------------------------------------------------------------------------------
+**ListRecords (oai_dc)**  
+http://localhost/?verb=ListRecords&metadataPrefix=oai_dc  
+---------------------------------------------------------------
+
 
 ## Bridge Interface Features
 
@@ -138,16 +142,6 @@ http://localhost/?verb=ListRecords&metadataPrefix=oai_dc
 -   Docker & Docker Compose
 -   Nginx Reverse Proxy
 
-## Configuration
-
-Edit `config/config.yml` to customize:
-
--   Repository name and admin e-mail\
--   Database connection settings\
--   Metadata formats\
--   Deleted record policies\
--   Max records per request\
--   Resumption token validity
 
 ## Managing the Application
 
