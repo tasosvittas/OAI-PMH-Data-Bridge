@@ -56,7 +56,79 @@ Check that all services are running:
 docker-compose ps
 
 
-### Test the service:
-http://localhost:5000/
+## Usage
+
+### Access Points
+
+- **Bridge Web Interface**: http://localhost:5000/
+- **OAI-PMH Repository**: http://localhost/
+- **List Records**: http://localhost/?verb=ListRecords&metadataPrefix=oai_dc
+
+### Bridge Interface Features
+
+1. **Search GitHub**: Find and import GitHub repositories
+2. **Search Zenodo**: Find and import Zenodo datasets
+3. **View Records**: Browse imported records
+4. **Health Check**: Monitor system status at `/health`
+
+### OAI-PMH Endpoints
+
+Standard OAI-PMH 2.0 verbs are supported:
+
+- `?verb=Identify` - Repository information
+- `?verb=ListMetadataFormats` - Available metadata formats
+- `?verb=ListRecords&metadataPrefix=oai_dc` - List all records
+- `?verb=GetRecord&identifier=ID&metadataPrefix=oai_dc` - Get single record
+- `?verb=ListSets` - List available sets
+
+## Project Structure
+OAI-PMH-Data-Bridge/
+├── bin/ # CLI tools
+├── bridge/ # Python Flask bridge application
+├── config/ # Configuration files
+├── data/ # SQLite database
+├── docker/ # Docker configuration
+├── public/ # PHP public directory
+├── src/ # OAI-PMH PHP source code
+├── var/ # Cache and generated files
+├── docker-compose.yml # Docker Compose configuration
+├── Dockerfile.php # PHP container image
+└── README.md # This file
 
 
+## Technology Stack
+
+### Backend
+- PHP 8.1 with Apache
+- Doctrine ORM
+- Symfony Console
+- Python 3.11
+- Flask
+
+### Database
+- SQLite 3
+
+### Infrastructure
+- Docker & Docker Compose
+- Nginx
+
+## Configuration
+
+Edit `config/config.yml` to customize:
+
+- Repository name and admin email
+- Database connection (default: SQLite)
+- Metadata formats
+- Deleted records policy
+- Maximum records per request
+- Resumption token validity
+
+## Stopping the Application
+
+docker-compose down
+
+
+## Restarting (After Initial Setup)
+
+cd OAI-PMH-Data-Bridge
+docker-compose up -d
